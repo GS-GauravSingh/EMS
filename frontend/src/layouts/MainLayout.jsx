@@ -27,6 +27,11 @@ export default function MainLayout() {
               Employees
             </NavLink>
             {isAdmin && (
+              <NavLink to="/users" className={linkClass}>
+                Users
+              </NavLink>
+            )}
+            {isAdmin && (
               <NavLink to="/employees/new" className={linkClass}>
                 Add Employee
               </NavLink>

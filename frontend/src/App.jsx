@@ -7,6 +7,7 @@ import Dashboard from "./pages/Dashboard.jsx";
 import Employees from "./pages/Employees.jsx";
 import AddEmployee from "./pages/AddEmployee.jsx";
 import EditEmployee from "./pages/EditEmployee.jsx";
+import ManageUsers from "./pages/ManageUsers.jsx";
 import NotFound from "./pages/NotFound.jsx";
 
 export default function App() {
@@ -23,6 +24,14 @@ export default function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/employees" element={<Employees />} />
+          <Route
+            path="/users"
+            element={
+              <ProtectedRoute adminOnly>
+                <ManageUsers />
+              </ProtectedRoute>
+            }
+          />
           <Route
             path="/employees/new"
             element={
