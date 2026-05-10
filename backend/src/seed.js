@@ -17,8 +17,8 @@ function makeUserSeedData() {
   const users = [
     {
       name: "System Admin",
-      email: "admin@ems.local",
-      password: "admin123",
+      email: "admin@yopmail.com",
+      password: "password@123",
       role: "admin",
     },
   ];
@@ -26,8 +26,8 @@ function makeUserSeedData() {
   for (let i = 1; i <= 20; i += 1) {
     users.push({
       name: `Employee User ${i}`,
-      email: `user${i}@ems.local`,
-      password: "password123",
+      email: `user${i}@yopmail.com`,
+      password: "password@123",
       role: i % 7 === 0 ? "admin" : "employee",
     });
   }
@@ -45,7 +45,7 @@ function makeEmployeeSeedData(createdById) {
     employees.push({
       firstName: `First${i}`,
       lastName: `Last${i}`,
-      email: `employee${i}@company.local`,
+      email: `employee${i}@yopmail.com`,
       phone: `+91-90000${String(i).padStart(5, "0")}`,
       department,
       position,
@@ -71,7 +71,7 @@ async function seed() {
     await User.create(usersToCreate);
   }
 
-  const admin = await User.findOne({ email: "admin@ems.local" }).select("_id");
+  const admin = await User.findOne({ email: "admin@yopmail.com" }).select("_id");
   if (!admin) {
     throw new Error("Admin user missing after seeding users");
   }
@@ -100,8 +100,8 @@ async function seed() {
   console.log(`Total employees in DB: ${totalEmployees}`);
   console.log("");
   console.log("Sample credentials:");
-  console.log("  Admin: admin@ems.local / admin123");
-  console.log("  User: user1@ems.local / password123");
+  console.log("  Admin: admin@yopmail.com / password@123");
+  console.log("  User: user1@yopmail.com / password@123");
 
   if (usersToCreate.length === 0 && employeesToCreate.length === 0) {
     console.log("Nothing new was inserted (seed data already exists).");
