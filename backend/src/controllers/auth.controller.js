@@ -193,6 +193,64 @@ export async function verifyLoginOtp(req, res, next) {
   }
 }
 
+export async function requestForgotPasswordOtp(req, res, next) {
+  try {
+    const { email } = req.body;
+    if (!email) {
+      throw new AppError("Please provide email", 400);
+    }
+
+    const normalizedEmail = email.toLowerCase().trim();
+    const user = await User.findOne({ email: normalizedEmail }).select("_id email");
+
+    // Return same response even when user does not exist, to avoid email enumeration.
+    if (user) {
+      await createAndSendOtp({
+        email: normalizedEmail,
+        purpose: "forgot_password",
+        payload: { userId: user._id.toString() },
+        otpTtlMinutes: env.otpTtlMinutes,
+      });
+    }
+
+    res.json({
+      success: true,
+      message: "If the email is registered, an OTP has been sent",
+    });
+  } catch (err) {
+    next(err);
+  }
+}
+
+export async function resetPasswordWithOtp(req, res, next) {
+  try {
+    const { email, otp, newPassword } = req.body;
+    if (!email || !otp || !newPassword) {
+      throw new AppError("Please provide email, OTP and new password", 400);
+    }
+    if (String(newPassword).length < 6) {
+      throw new AppError("Password must be at least 6 characters long", 400);
+    }
+
+    const otpRecord = await verifyOtp({ email, purpose: "forgot_password", otp });
+    if (!otpRecord.payload?.userId) {
+      throw new AppError("Reset OTP payload is invalid. Please try again.", 400);
+    }
+
+    const user = await User.findById(otpRecord.payload.userId).select("+password");
+    if (!user || user.email !== otpRecord.email) {
+      throw new AppError("Invalid reset request. Please try again.", 401);
+    }
+
+    user.password = newPassword;
+    await user.save();
+
+    res.json({ success: true, message: "Password reset successful. Please login." });
+  } catch (err) {
+    next(err);
+  }
+}
+
 export async function logout(_req, res) {
   res.clearCookie("token", { ...COOKIE_OPTIONS, maxAge: 0 });
   res.json({ success: true, message: "Logged out" });

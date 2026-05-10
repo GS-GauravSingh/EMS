@@ -22,7 +22,12 @@ function getTransporter() {
 }
 
 export async function sendOtpEmail({ to, otp, purpose }) {
-  const subject = purpose === "register" ? "Your EMS registration OTP" : "Your EMS login OTP";
+  const subjectMap = {
+    register: "Your EMS registration OTP",
+    login: "Your EMS login OTP",
+    forgot_password: "Your EMS password reset OTP",
+  };
+  const subject = subjectMap[purpose] || "Your EMS OTP";
   const text = `Your OTP is ${otp}. It expires in ${env.otpTtlMinutes} minutes.`;
 
   const smtp = getTransporter();

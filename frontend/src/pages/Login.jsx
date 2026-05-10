@@ -15,6 +15,7 @@ const initialForm = {
   email: "",
   password: "",
   otp: "",
+  newPassword: "",
 };
 
 export default function Login() {
@@ -40,10 +41,11 @@ export default function Login() {
     setForm(initialForm);
   }, [mode]);
 
-  const modeTitle = useMemo(
-    () => (mode === "login" ? "Sign in to continue" : "Create your account"),
-    [mode]
-  );
+  const modeTitle = useMemo(() => {
+    if (mode === "register") return "Create your account";
+    if (mode === "forgot") return "Reset your password";
+    return "Sign in to continue";
+  }, [mode]);
 
   if (loading) {
     return (
@@ -63,11 +65,15 @@ export default function Login() {
           email: form.email,
           password: form.password,
         });
-      } else {
+      } else if (mode === "register") {
         await authService.requestRegisterOtp({
           name: form.name,
           email: form.email,
           password: form.password,
+        });
+      } else {
+        await authService.requestForgotPasswordOtp({
+          email: form.email,
         });
       }
 
@@ -88,12 +94,25 @@ export default function Login() {
       if (mode === "login") {
         await completeLoginOtp({ email: form.email, otp: form.otp });
         toast.success("Login successful");
-      } else {
+        navigate(from, { replace: true });
+      } else if (mode === "register") {
         await completeRegisterOtp({ email: form.email, otp: form.otp });
         toast.success("Registration successful");
+        navigate(from, { replace: true });
+      } else {
+        await authService.resetPasswordWithOtp({
+          email: form.email,
+          otp: form.otp,
+          newPassword: form.newPassword,
+        });
+        toast.success("Password reset successful. Please sign in.");
+        setMode("login");
+        setStep("credentials");
+        setForm((prev) => ({
+          ...initialForm,
+          email: prev.email,
+        }));
       }
-
-      navigate(from, { replace: true });
     } catch (err) {
       toast.error(getErrorMessage(err));
     } finally {
@@ -129,6 +148,18 @@ export default function Login() {
             Register
           </button>
         </div>
+        <button
+          type="button"
+          className={`mt-3 w-full rounded-lg py-2 text-sm font-medium transition ${
+            mode === "forgot"
+              ? "bg-brand-50 text-brand-700 ring-1 ring-brand-200"
+              : "text-slate-600 hover:bg-slate-100"
+          }`}
+          onClick={() => setMode("forgot")}
+          disabled={sendingOtp || submitting}
+        >
+          Forgot Password
+        </button>
 
         {step === "credentials" ? (
           <form onSubmit={requestOtp} className="mt-6 space-y-4">
@@ -160,21 +191,23 @@ export default function Login() {
                 required
               />
             </div>
-            <div>
-              <label htmlFor="password" className="block text-sm font-medium text-slate-700">
-                Password
-              </label>
-              <input
-                id="password"
-                type="password"
-                autoComplete={mode === "login" ? "current-password" : "new-password"}
-                className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-brand-500 focus:ring-2"
-                value={form.password}
-                onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
-                required
-                minLength={6}
-              />
-            </div>
+            {mode !== "forgot" && (
+              <div>
+                <label htmlFor="password" className="block text-sm font-medium text-slate-700">
+                  Password
+                </label>
+                <input
+                  id="password"
+                  type="password"
+                  autoComplete={mode === "login" ? "current-password" : "new-password"}
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-brand-500 focus:ring-2"
+                  value={form.password}
+                  onChange={(e) => setForm((f) => ({ ...f, password: e.target.value }))}
+                  required
+                  minLength={6}
+                />
+              </div>
+            )}
             <Button type="submit" className="w-full" disabled={sendingOtp}>
               {sendingOtp ? "Sending OTP..." : "Send OTP"}
             </Button>
@@ -201,9 +234,32 @@ export default function Login() {
                 OTP sent to <span className="font-medium">{form.email}</span>
               </p>
             </div>
+            {mode === "forgot" && (
+              <div>
+                <label htmlFor="newPassword" className="block text-sm font-medium text-slate-700">
+                  New password
+                </label>
+                <input
+                  id="newPassword"
+                  type="password"
+                  autoComplete="new-password"
+                  className="mt-1 w-full rounded-lg border border-slate-200 px-3 py-2 text-sm outline-none ring-brand-500 focus:ring-2"
+                  value={form.newPassword}
+                  onChange={(e) => setForm((f) => ({ ...f, newPassword: e.target.value }))}
+                  required
+                  minLength={6}
+                />
+              </div>
+            )}
 
             <Button type="submit" className="w-full" disabled={submitting || form.otp.length !== 6}>
-              {submitting ? "Verifying..." : mode === "login" ? "Verify & Sign in" : "Verify & Create account"}
+              {submitting
+                ? "Verifying..."
+                : mode === "login"
+                  ? "Verify & Sign in"
+                  : mode === "register"
+                    ? "Verify & Create account"
+                    : "Verify OTP & Reset password"}
             </Button>
 
             <button
@@ -218,7 +274,7 @@ export default function Login() {
         )}
 
         <p className="mt-6 text-center text-xs text-slate-500">
-          Two-step authentication is required for both registration and login.
+          Two-step OTP is enabled for registration, login, and password reset.
         </p>
         <p className="mt-2 text-center text-sm">
           <Link to="/dashboard" className="text-brand-600 hover:underline">

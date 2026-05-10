@@ -6,7 +6,7 @@ const authOtpSchema = new mongoose.Schema(
     email: { type: String, required: true, lowercase: true, trim: true, index: true },
     purpose: {
       type: String,
-      enum: ["register", "login"],
+      enum: ["register", "login", "forgot_password"],
       required: true,
       index: true,
     },

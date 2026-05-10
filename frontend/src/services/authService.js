@@ -25,6 +25,16 @@ export async function verifyLoginOtp(payload) {
   return data.user;
 }
 
+export async function requestForgotPasswordOtp(payload) {
+  const { data } = await api.post("/api/auth/forgot-password/request-otp", payload);
+  return data;
+}
+
+export async function resetPasswordWithOtp(payload) {
+  const { data } = await api.post("/api/auth/forgot-password/reset", payload);
+  return data;
+}
+
 export async function logout() {
   await api.post("/api/auth/logout");
 }
