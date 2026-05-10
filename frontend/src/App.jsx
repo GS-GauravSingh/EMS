@@ -5,6 +5,7 @@ import MainLayout from "./layouts/MainLayout.jsx";
 import Login from "./pages/Login.jsx";
 import Dashboard from "./pages/Dashboard.jsx";
 import Employees from "./pages/Employees.jsx";
+import Attendance from "./pages/Attendance.jsx";
 import AddEmployee from "./pages/AddEmployee.jsx";
 import EditEmployee from "./pages/EditEmployee.jsx";
 import ManageUsers from "./pages/ManageUsers.jsx";
@@ -24,6 +25,10 @@ export default function App() {
         >
           <Route path="/dashboard" element={<Dashboard />} />
           <Route path="/employees" element={<Employees />} />
+          <Route
+            path="/attendance"
+            element={<Attendance />}
+          />
           <Route
             path="/users"
             element={
