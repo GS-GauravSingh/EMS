@@ -17,7 +17,7 @@ function makeUserSeedData() {
   const users = [
     {
       name: "System Admin",
-      email: "admin@yopmail.com",
+      email: "emsAdmin@yopmail.com",
       password: "password@123",
       role: "admin",
     },
@@ -71,7 +71,7 @@ async function seed() {
     await User.create(usersToCreate);
   }
 
-  const admin = await User.findOne({ email: "admin@yopmail.com" }).select("_id");
+  const admin = await User.findOne({ email: "emsAdmin@yopmail.com" }).select("_id");
   if (!admin) {
     throw new Error("Admin user missing after seeding users");
   }
@@ -100,7 +100,7 @@ async function seed() {
   console.log(`Total employees in DB: ${totalEmployees}`);
   console.log("");
   console.log("Sample credentials:");
-  console.log("  Admin: admin@yopmail.com / password@123");
+  console.log("  Admin: emsAdmin@yopmail.com / password@123");
   console.log("  User: user1@yopmail.com / password@123");
 
   if (usersToCreate.length === 0 && employeesToCreate.length === 0) {
