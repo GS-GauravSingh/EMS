@@ -12,4 +12,10 @@ export const env = {
     .split(",")
     .map((url) => url.trim())
     .filter(Boolean),
+  otpTtlMinutes: Number(process.env.OTP_TTL_MINUTES || 10),
+  smtpHost: process.env.SMTP_HOST || "",
+  smtpPort: process.env.SMTP_PORT || "",
+  smtpUser: process.env.SMTP_USER || "",
+  smtpPass: process.env.SMTP_PASS || "",
+  smtpFrom: process.env.SMTP_FROM || "noreply@ems.local",
 };

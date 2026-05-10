@@ -5,13 +5,23 @@ export async function fetchMe() {
   return data.user;
 }
 
-export async function login(credentials) {
-  const { data } = await api.post("/api/auth/login", credentials);
+export async function requestRegisterOtp(payload) {
+  const { data } = await api.post("/api/auth/register/request-otp", payload);
+  return data;
+}
+
+export async function verifyRegisterOtp(payload) {
+  const { data } = await api.post("/api/auth/register/verify-otp", payload);
   return data.user;
 }
 
-export async function register(payload) {
-  const { data } = await api.post("/api/auth/register", payload);
+export async function requestLoginOtp(payload) {
+  const { data } = await api.post("/api/auth/login/request-otp", payload);
+  return data;
+}
+
+export async function verifyLoginOtp(payload) {
+  const { data } = await api.post("/api/auth/login/verify-otp", payload);
   return data.user;
 }
 

@@ -29,14 +29,14 @@ export function AuthProvider({ children }) {
     refreshUser();
   }, [refreshUser]);
 
-  const login = useCallback(async (credentials) => {
-    const u = await authService.login(credentials);
+  const completeLoginOtp = useCallback(async (payload) => {
+    const u = await authService.verifyLoginOtp(payload);
     setUser(u);
     return u;
   }, []);
 
-  const register = useCallback(async (payload) => {
-    const u = await authService.register(payload);
+  const completeRegisterOtp = useCallback(async (payload) => {
+    const u = await authService.verifyRegisterOtp(payload);
     setUser(u);
     return u;
   }, []);
@@ -51,12 +51,12 @@ export function AuthProvider({ children }) {
       user,
       loading,
       isAdmin: user?.role === "admin",
-      login,
-      register,
+      completeLoginOtp,
+      completeRegisterOtp,
       logout,
       refreshUser,
     }),
-    [user, loading, login, register, logout, refreshUser]
+    [user, loading, completeLoginOtp, completeRegisterOtp, logout, refreshUser]
   );
 
   return <AuthContext.Provider value={value}>{children}</AuthContext.Provider>;
